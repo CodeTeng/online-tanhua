@@ -22,8 +22,8 @@ public class MovementTimeLine implements Serializable {
     private static final long serialVersionUID = 9096178416317502524L;
     @Id
     private ObjectId id;
-    private ObjectId movementId;//动态id
-    private Long userId;   //发布动态用户id
+    private ObjectId movementId;// 动态id
+    private Long userId;   // 发布动态用户id
     private Long friendId; // 可见好友id
     private Long created; //发布的时间
 }

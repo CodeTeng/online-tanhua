@@ -1,6 +1,7 @@
 package com.tanhua.server.service.impl;
 
 import com.tanhua.autoconfig.template.SmsTemplate;
+import com.tanhua.commons.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
@@ -39,14 +40,14 @@ public class UserServiceImpl implements UserService {
         // 2. 发送短信
         smsTemplate.sendSms(mobile, code);
         // 3. 存入 redis
-        stringRedisTemplate.opsForValue().set("CHECK_CODE_" + mobile, code, 5L, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(Constants.SMS_CODE + mobile, code, 5L, TimeUnit.MINUTES);
         return ResponseEntity.ok(null);
     }
 
     @Override
     public ResponseEntity login(String mobile, String code) {
         // 1. 从 redis 中获取验证码
-        String redisCode = stringRedisTemplate.opsForValue().get("CHECK_CODE_" + mobile);
+        String redisCode = stringRedisTemplate.opsForValue().get(Constants.SMS_CODE + mobile);
         // 2. 判断是否有效
         if (StringUtils.isBlank(redisCode)) {
             return ResponseEntity.status(500).body("验证码已过期");
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(500).body("输入验证码错误");
         }
         // 4. 删除验证码
-        stringRedisTemplate.delete("CHECK_CODE_" + mobile);
+        stringRedisTemplate.delete(Constants.SMS_CODE + mobile);
         // 5. 根据手机号查询用户信息
         User user = userApi.findByMobile(mobile);
         boolean isNew = false;

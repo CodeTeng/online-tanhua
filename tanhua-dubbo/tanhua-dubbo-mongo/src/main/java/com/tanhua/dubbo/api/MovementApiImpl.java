@@ -3,15 +3,22 @@ package com.tanhua.dubbo.api;
 import com.tanhua.dubbo.utils.IdWorker;
 import com.tanhua.dubbo.utils.TimeLineService;
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.mongo.MovementTimeLine;
 import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -65,5 +72,37 @@ public class MovementApiImpl implements MovementApi {
                 .with(Sort.by(Sort.Order.desc("created")));
         List<Movement> movementList = mongoTemplate.find(query, Movement.class);
         return new PageResult(page, pagesize, 0, movementList);
+    }
+
+    @Override
+    public List<Movement> findFriendMovements(Integer page, Integer pagesize, Long friendId) {
+        // 1. 查询好友
+        Query query = Query.query(Criteria.where("friendId").is(friendId))
+                .skip((long) (page - 1) * pagesize).limit(pagesize)
+                .with(Sort.by(Sort.Order.desc("created")));
+        List<MovementTimeLine> movementTimeLineList = mongoTemplate.find(query, MovementTimeLine.class);
+        if (movementTimeLineList.isEmpty()) {
+            // 没有好友 直接返回
+            return new ArrayList<>();
+        }
+        // 2. 提取好友线中的动态id
+        List<ObjectId> objectIdList = movementTimeLineList.stream().map(MovementTimeLine::getMovementId).collect(Collectors.toList());
+        // 3. 根据动态id查询动态集合
+        return mongoTemplate.find(Query.query(Criteria.where("id").in(objectIdList)), Movement.class);
+    }
+
+    @Override
+    public List<Movement> randomMovements(Integer counts) {
+        // 1、创建统计对象，设置统计参数
+        TypedAggregation<Movement> aggregation = Aggregation.newAggregation(Movement.class, Aggregation.sample(counts));
+        // 2、调用mongoTemplate方法统计
+        AggregationResults<Movement> results = mongoTemplate.aggregate(aggregation, Movement.class);
+        // 3、获取统计结果
+        return results.getMappedResults();
+    }
+
+    @Override
+    public List<Movement> findMovementsByPids(List<Long> pidList) {
+        return mongoTemplate.find(Query.query(Criteria.where("pid").in(pidList)), Movement.class);
     }
 }

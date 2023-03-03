@@ -21,4 +21,14 @@ public interface MovementsService {
      * 查询我的动态
      */
     PageResult findByUserId(Long userId, Integer page, Integer pagesize);
+
+    /**
+     * 查询好友动态
+     */
+    PageResult findFriendMovements(Integer page, Integer pagesize);
+
+    /**
+     * 查询推荐动态列表
+     */
+    PageResult findRecommendMovements(Integer page, Integer pagesize);
 }
