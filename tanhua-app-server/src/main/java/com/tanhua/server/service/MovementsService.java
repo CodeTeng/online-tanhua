@@ -1,6 +1,7 @@
 package com.tanhua.server.service;
 
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,4 +32,9 @@ public interface MovementsService {
      * 查询推荐动态列表
      */
     PageResult findRecommendMovements(Integer page, Integer pagesize);
+
+    /**
+     * 查询单条动态
+     */
+    MovementsVo findById(String movementId);
 }

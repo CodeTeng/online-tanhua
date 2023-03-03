@@ -105,4 +105,9 @@ public class MovementApiImpl implements MovementApi {
     public List<Movement> findMovementsByPids(List<Long> pidList) {
         return mongoTemplate.find(Query.query(Criteria.where("pid").in(pidList)), Movement.class);
     }
+
+    @Override
+    public Movement findById(String movementId) {
+        return mongoTemplate.findById(movementId, Movement.class);
+    }
 }

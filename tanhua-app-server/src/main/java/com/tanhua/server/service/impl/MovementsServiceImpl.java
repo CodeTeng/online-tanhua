@@ -143,4 +143,16 @@ public class MovementsServiceImpl implements MovementsService {
         }
         return getPageResult(page, pagesize, list);
     }
+
+    @Override
+    public MovementsVo findById(String movementId) {
+        // 1. 查询动态
+        Movement movement = movementApi.findById(movementId);
+        if (movement == null) {
+            return null;
+        }
+        // 2. 根据动态查询用户详细信息
+        UserInfo userInfo = userInfoApi.findById(movement.getUserId());
+        return MovementsVo.init(userInfo, movement);
+    }
 }

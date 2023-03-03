@@ -1,6 +1,7 @@
 package com.tanhua.server.controller;
 
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.service.MovementsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +60,14 @@ public class MovementsController {
                                     @RequestParam(defaultValue = "10") Integer pagesize) {
         PageResult pr = movementsService.findRecommendMovements(page, pagesize);
         return ResponseEntity.ok(pr);
+    }
+
+    /**
+     * 查询单条动态
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity findById(@PathVariable("id") String movementId) {
+        MovementsVo vo = movementsService.findById(movementId);
+        return ResponseEntity.ok(vo);
     }
 }

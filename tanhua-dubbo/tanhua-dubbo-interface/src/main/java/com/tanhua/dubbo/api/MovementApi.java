@@ -37,4 +37,9 @@ public interface MovementApi {
      * 根据pid数组查询动态
      */
     List<Movement> findMovementsByPids(List<Long> pidList);
+
+    /**
+     * 根据id查询动态
+     */
+    Movement findById(String movementId);
 }
