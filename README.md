@@ -1,0 +1,2 @@
+# online-tanhua
+该项目是基于SpirngBoot+SpringCloud+Dubbo的微服务项目，中间采用MongoDB、Redis、RabbitMQ等技术以及采用第三方技术如OSS、SMS、百度云人脸识别，最后采用Spark+Mlib实现推荐系统的一个在线交友项目
