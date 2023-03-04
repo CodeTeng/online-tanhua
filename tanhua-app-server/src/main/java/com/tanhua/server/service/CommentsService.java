@@ -17,4 +17,24 @@ public interface CommentsService {
      * 发布评论
      */
     void saveComments(String movementId, String content);
+
+    /**
+     * 点赞
+     */
+    Integer likeComment(String movementId);
+
+    /**
+     * 取消点赞
+     */
+    Integer dislikeComment(String movementId);
+
+    /**
+     * 喜欢
+     */
+    Integer loveComment(String movementId);
+
+    /**
+     * 取消动态喜欢
+     */
+    Integer disloveComment(String movementId);
 }

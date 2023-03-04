@@ -62,10 +62,6 @@ public class MovementsVo implements Serializable {
         // 设置是否点赞(后续处理)
         vo.setHasLoved(0);
         vo.setHasLiked(0);
-        // 点赞，喜欢，评论数量
-        vo.setLikeCount(0);
-        vo.setLoveCount(0);
-        vo.setCommentCount(0);
         return vo;
     }
 }

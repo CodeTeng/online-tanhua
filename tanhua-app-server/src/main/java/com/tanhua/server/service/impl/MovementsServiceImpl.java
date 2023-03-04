@@ -112,6 +112,16 @@ public class MovementsServiceImpl implements MovementsService {
             UserInfo userInfo = map.get(movement.getUserId());
             if (userInfo != null) {
                 MovementsVo vo = MovementsVo.init(userInfo, movement);
+                String key = Constants.MOVEMENTS_INTERACT_KEY + movement.getId().toHexString();
+                String hashKey = Constants.MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();
+                if (stringRedisTemplate.opsForHash().hasKey(key, hashKey)) {
+                    vo.setHasLiked(1);
+                }
+                key = Constants.MOVEMENTS_INTERACT_KEY + movement.getId().toHexString();
+                hashKey = Constants.MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();
+                if (stringRedisTemplate.opsForHash().hasKey(key, hashKey)) {
+                    vo.setHasLoved(1);
+                }
                 vos.add(vo);
             }
         }

@@ -46,7 +46,7 @@ public class Movement implements Serializable {
         } else if (commentType == CommentType.COMMENT.getType()) {
             return this.commentCount;
         } else {
-            return loveCount;
+            return this.loveCount;
         }
     }
 }

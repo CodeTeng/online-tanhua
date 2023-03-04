@@ -4,6 +4,7 @@ import com.tanhua.model.enums.CommentType;
 import com.tanhua.model.mongo.Comment;
 import com.tanhua.model.mongo.Movement;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -26,7 +27,7 @@ public class CommentApiImpl implements CommentApi {
 
     @Override
     public List<Comment> findComments(String movementId, CommentType comment, Integer page, Integer pagesize) {
-        Query query = Query.query(Criteria.where("publishId").is(movementId).and("commentType").is(comment.getType()))
+        Query query = Query.query(Criteria.where("publishId").is(new ObjectId(movementId)).and("commentType").is(comment.getType()))
                 .skip((long) (page - 1) * pagesize).limit(pagesize)
                 .with(Sort.by(Sort.Order.desc("created")));
         return mongoTemplate.find(query, Comment.class);
@@ -48,6 +49,38 @@ public class CommentApiImpl implements CommentApi {
             update.inc("commentCount", 1);
         } else {
             update.inc("loveCount", 1);
+        }
+        // 设置更新参数
+        FindAndModifyOptions options = new FindAndModifyOptions();
+        // 获取更新后的最新数据
+        options.returnNew(true);
+        Movement modify = mongoTemplate.findAndModify(query, update, options, Movement.class);
+        return modify.statisticsCount(comment.getCommentType());
+    }
+
+    @Override
+    public Boolean hasComment(String movementId, Long userId, CommentType commentType) {
+        Query query = Query.query(Criteria.where("userId").is(userId)
+                .and("publishId").is(new ObjectId(movementId))
+                .and("commentType").is(commentType.getType()));
+        return mongoTemplate.exists(query, Comment.class);
+    }
+
+    @Override
+    public Integer delete(Comment comment) {
+        Criteria criteria = Criteria.where("userId").is(comment.getUserId())
+                .and("publishId").is(comment.getPublishId())
+                .and("commentType").is(comment.getCommentType());
+        mongoTemplate.remove(Query.query(criteria), Comment.class);
+        // 更新动态表中的字段
+        Query query = Query.query(Criteria.where("id").is(comment.getPublishId()));
+        Update update = new Update();
+        if (comment.getCommentType() == CommentType.LIKE.getType()) {
+            update.inc("likeCount", -1);
+        } else if (comment.getCommentType() == CommentType.COMMENT.getType()) {
+            update.inc("commentCount", -1);
+        } else {
+            update.inc("loveCount", -1);
         }
         // 设置更新参数
         FindAndModifyOptions options = new FindAndModifyOptions();

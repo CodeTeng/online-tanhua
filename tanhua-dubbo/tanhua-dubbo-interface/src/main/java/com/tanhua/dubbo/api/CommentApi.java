@@ -20,4 +20,14 @@ public interface CommentApi {
      * 发布评论并获取评论数量
      */
     Integer save(Comment comment);
+
+    /**
+     * 判断用户是否点赞过
+     */
+    Boolean hasComment(String movementId, Long userId, CommentType commentType);
+
+    /**
+     * 取消点赞
+     */
+    Integer delete(Comment comment);
 }
