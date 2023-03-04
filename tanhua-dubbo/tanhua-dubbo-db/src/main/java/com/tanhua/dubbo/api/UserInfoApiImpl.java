@@ -43,6 +43,7 @@ public class UserInfoApiImpl implements UserInfoApi {
         if (userInfo != null) {
             queryWrapper.lt(userInfo.getAge() != null, "age", userInfo.getAge());
             queryWrapper.eq(StringUtils.isNoneBlank(userInfo.getGender()), "gender", userInfo.getGender());
+            queryWrapper.like(StringUtils.isNoneBlank(userInfo.getNickname()), "nickname", userInfo.getNickname());
         }
         List<UserInfo> userInfoList = userInfoMapper.selectList(queryWrapper);
         return CollUtil.fieldValueMap(userInfoList, "id");

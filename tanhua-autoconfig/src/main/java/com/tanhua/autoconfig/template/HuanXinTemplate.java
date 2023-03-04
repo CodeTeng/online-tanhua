@@ -66,11 +66,11 @@ public class HuanXinTemplate {
     //发送消息
     public Boolean sendMsg(String username, String content) {
         try {
-            //接收人用户列表
+            // 接收人用户列表
             Set<String> set = CollUtil.newHashSet(username);
-            //文本消息
+            // 文本消息
             EMTextMessage message = new EMTextMessage().text(content);
-            //发送消息  from：admin是管理员发送
+            // 发送消息  from：admin是管理员发送
             emService.message().send("admin", "users", set, message, null).block();
             return true;
         } catch (Exception e) {

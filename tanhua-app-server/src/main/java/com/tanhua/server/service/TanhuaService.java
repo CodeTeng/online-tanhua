@@ -19,4 +19,19 @@ public interface TanhuaService {
      * 查询分页推荐好友列表
      */
     PageResult recommendation(RecommendUserDto dto);
+
+    /**
+     * 查询佳人信息
+     */
+    TodayBest personalInfo(Long userId);
+
+    /**
+     * 查看陌生人问题
+     */
+    String strangerQuestions(Long userId);
+
+    /**
+     * 回复陌生人问题
+     */
+    void replyQuestions(Long userId, String reply);
 }

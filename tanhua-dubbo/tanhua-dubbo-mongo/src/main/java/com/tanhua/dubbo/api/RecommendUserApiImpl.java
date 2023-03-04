@@ -37,4 +37,18 @@ public class RecommendUserApiImpl implements RecommendUserApi {
         long count = mongoTemplate.count(query, RecommendUser.class);
         return new PageResult(page, pagesize, (int) count, recommendUserList);
     }
+
+    @Override
+    public RecommendUser queryByUserId(Long recommendUserId, Long userId) {
+        Query query = Query.query(Criteria.where("toUserId").is(userId).and("userId").is(recommendUserId));
+        RecommendUser recommendUser = mongoTemplate.findOne(query, RecommendUser.class);
+        if (recommendUser == null) {
+            recommendUser = new RecommendUser();
+            recommendUser.setUserId(recommendUserId);
+            recommendUser.setToUserId(userId);
+            // 构建缘分值
+            recommendUser.setScore(90d);
+        }
+        return recommendUser;
+    }
 }
