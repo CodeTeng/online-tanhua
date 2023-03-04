@@ -1,5 +1,6 @@
 package com.tanhua.server.service.impl;
 
+import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.autoconfig.template.SmsTemplate;
 import com.tanhua.commons.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
@@ -32,6 +33,8 @@ public class UserServiceImpl implements UserService {
     private StringRedisTemplate stringRedisTemplate;
     @DubboReference
     private UserApi userApi;
+    @Autowired
+    private HuanXinTemplate huanXinTemplate;
 
     @Override
     public ResponseEntity sendMsg(String mobile) {
@@ -65,10 +68,18 @@ public class UserServiceImpl implements UserService {
             // 用户不存在 创建新用户
             user = new User();
             user.setMobile(mobile);
-            user.setPassword(DigestUtils.md5Hex("123456"));
+            user.setPassword(DigestUtils.md5Hex(Constants.INIT_PASSWORD));
             Long userId = userApi.save(user);
             user.setId(userId);
             isNew = true;
+            // 注册环信用户
+            String hxUser = Constants.HX_USER_PREFIX + userId;
+            Boolean flag = huanXinTemplate.createUser(hxUser, Constants.INIT_PASSWORD);
+            if (flag) {
+                user.setHxUser(hxUser);
+                user.setHxPassword(Constants.INIT_PASSWORD);
+                userApi.update(user);
+            }
         }
         // 6. 生成 token
         Map tokenMap = new HashMap();

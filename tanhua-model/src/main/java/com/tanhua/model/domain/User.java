@@ -21,4 +21,7 @@ public class User implements Serializable {
     private String password;
     private Date created;
     private Date updated;
+    // 环信用户信息
+    private String hxUser;
+    private String hxPassword;
 }

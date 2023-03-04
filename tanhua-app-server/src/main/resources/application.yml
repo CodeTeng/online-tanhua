@@ -47,3 +47,8 @@ tanhua:
     appId: 30865459
     apiKey: 0nnsoeDWvymtVg7GsXvZjc57
     secretKey: OgkjDo4BQtf5zaMwx1Wtpzg1dNEzok83
+  # 环信IM配置
+  huanxin:
+    appkey: 1111230304175061#tanhua
+    clientId: YXA6APsROq6LTimLTOLi_f4I1Q
+    clientSecret: YXA6eTjZW2Ku7VBfF4xt2RATJqWNzq0

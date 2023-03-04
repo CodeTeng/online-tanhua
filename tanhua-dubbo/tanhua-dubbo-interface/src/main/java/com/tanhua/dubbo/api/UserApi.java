@@ -2,6 +2,8 @@ package com.tanhua.dubbo.api;
 
 import com.tanhua.model.domain.User;
 
+import java.util.List;
+
 /**
  * @description:
  * @author: ~Teng~
@@ -23,4 +25,24 @@ public interface UserApi {
      * @return 用户id
      */
     Long save(User user);
+
+    /**
+     * 更新用户信息
+     */
+    void update(User user);
+
+    /**
+     * 查询所有用户
+     */
+    List<User> findAll();
+
+    /**
+     * 根据id查询用户
+     */
+    User findById(Long userId);
+
+    /**
+     * 根据环信id查询用户信息
+     */
+    User findByHuanxinId(String huanxinId);
 }
