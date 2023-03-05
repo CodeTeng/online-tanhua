@@ -23,7 +23,7 @@ public class FriendApiImpl implements FriendApi {
     @Override
     public void save(Long userId, Long friendId) {
         // 1. 保存自己的好友数据
-        Query query1 = Query.query(Criteria.where("userId").is(userId).and("frinedId").is(friendId));
+        Query query1 = Query.query(Criteria.where("userId").is(userId).and("friendId").is(friendId));
         boolean flag1 = mongoTemplate.exists(query1, Friend.class);
         if (!flag1) {
             // 不存在 添加朋友
@@ -34,7 +34,7 @@ public class FriendApiImpl implements FriendApi {
             mongoTemplate.save(friend);
         }
         // 2. 添加好友的数据
-        Query query2 = Query.query(Criteria.where("userId").is(friendId).and("frinedId").is(userId));
+        Query query2 = Query.query(Criteria.where("userId").is(friendId).and("friendId").is(userId));
         boolean flag2 = mongoTemplate.exists(query2, Friend.class);
         if (!flag2) {
             // 不存在 添加对方与我的关系
@@ -52,5 +52,21 @@ public class FriendApiImpl implements FriendApi {
                 .skip((long) (page - 1) * pagesize).limit(pagesize)
                 .with(Sort.by(Sort.Order.desc("created")));
         return mongoTemplate.find(query, Friend.class);
+    }
+
+    @Override
+    public void delete(Long userId, Long friendId) {
+        // 1. 删除自己的好友数据
+        Query query1 = Query.query(Criteria.where("userId").is(userId).and("friendId").is(friendId));
+        boolean flag1 = mongoTemplate.exists(query1, Friend.class);
+        if (flag1) {
+            mongoTemplate.remove(query1, Friend.class);
+        }
+        // 2. 删除好友的数据
+        Query query2 = Query.query(Criteria.where("userId").is(friendId).and("friendId").is(userId));
+        boolean flag2 = mongoTemplate.exists(query2, Friend.class);
+        if (flag2) {
+            mongoTemplate.remove(query2, Friend.class);
+        }
     }
 }

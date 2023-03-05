@@ -1,15 +1,20 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.mongo.UserLike;
 import com.tanhua.model.vo.PageResult;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -50,5 +55,18 @@ public class RecommendUserApiImpl implements RecommendUserApi {
             recommendUser.setScore(90d);
         }
         return recommendUser;
+    }
+
+    @Override
+    public List<RecommendUser> queryCardsList(Long userId, int count) {
+        // 1. 查询用户自己喜欢和不喜欢的用户数据
+        List<UserLike> userLikeList = mongoTemplate.find(Query.query(Criteria.where("userId").is(userId)), UserLike.class);
+        List<Long> likeUserIdList = userLikeList.stream().map(UserLike::getLikeUserId).collect(Collectors.toList());
+        // 2. 排除自己喜欢和不喜欢的用户，查询推荐用户
+        TypedAggregation<RecommendUser> newAggregation = TypedAggregation.newAggregation(RecommendUser.class,
+                Aggregation.match(Criteria.where("toUserId").is(userId).and("userId").nin(likeUserIdList)),
+                Aggregation.sample(count));
+        AggregationResults<RecommendUser> results = mongoTemplate.aggregate(newAggregation, RecommendUser.class);
+        return results.getMappedResults();
     }
 }

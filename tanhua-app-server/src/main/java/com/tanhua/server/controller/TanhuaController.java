@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,6 +79,39 @@ public class TanhuaController {
             return ResponseEntity.status(403).body("回复内容不能为空");
         }
         tanhuaService.replyQuestions(userId, reply);
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 探花-推荐用户列表
+     */
+    @GetMapping("/cards")
+    public ResponseEntity queryCardsList() {
+        List<TodayBest> list = tanhuaService.queryCardsList();
+        return ResponseEntity.ok(list);
+    }
+
+    /**
+     * 喜欢
+     */
+    @GetMapping("{id}/love")
+    public ResponseEntity likeUser(@PathVariable("id") Long likeUserId) {
+        if (likeUserId == null || likeUserId <= 0) {
+            return ResponseEntity.status(403).body("参数错误");
+        }
+        tanhuaService.likeUser(likeUserId);
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 不喜欢
+     */
+    @GetMapping("{id}/unlove")
+    public ResponseEntity notLikeUser(@PathVariable("id") Long likeUserId) {
+        if (likeUserId == null || likeUserId <= 0) {
+            return ResponseEntity.status(403).body("参数错误");
+        }
+        tanhuaService.notLikeUser(likeUserId);
         return ResponseEntity.ok(null);
     }
 }

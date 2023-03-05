@@ -4,6 +4,8 @@ import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.TodayBest;
 
+import java.util.List;
+
 /**
  * @description:
  * @author: ~Teng~
@@ -34,4 +36,19 @@ public interface TanhuaService {
      * 回复陌生人问题
      */
     void replyQuestions(Long userId, String reply);
+
+    /**
+     * 探花-推荐用户列表
+     */
+    List<TodayBest> queryCardsList();
+
+    /**
+     * 喜欢
+     */
+    void likeUser(Long likeUserId);
+
+    /**
+     * 不喜欢
+     */
+    void notLikeUser(Long likeUserId);
 }

@@ -19,4 +19,9 @@ public interface FriendApi {
      * 分页查询当前用户的所有好友
      */
     List<Friend> findByUserId(Long userId, Integer page, Integer pagesize);
+
+    /**
+     * 删除朋友
+     */
+    void delete(Long userId, Long friendId);
 }

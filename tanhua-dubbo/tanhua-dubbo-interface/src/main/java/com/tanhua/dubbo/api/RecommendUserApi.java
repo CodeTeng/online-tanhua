@@ -3,6 +3,8 @@ package com.tanhua.dubbo.api;
 import com.tanhua.model.mongo.RecommendUser;
 import com.tanhua.model.vo.PageResult;
 
+import java.util.List;
+
 /**
  * @description:
  * @author: ~Teng~
@@ -26,4 +28,9 @@ public interface RecommendUserApi {
      * 根据推荐用户id和当前用户id查询推荐用户信息
      */
     RecommendUser queryByUserId(Long recommendUserId, Long userId);
+
+    /**
+     * 查询探花列表，查询时需要排除喜欢和不喜欢的用户
+     */
+    List<RecommendUser> queryCardsList(Long userId, int count);
 }

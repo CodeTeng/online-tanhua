@@ -91,4 +91,15 @@ public class MessagesServiceImpl implements MessagesService {
         });
         return new PageResult(page, pagesize, 0, voList);
     }
+
+    @Override
+    public void delete(Long friendId) {
+        // 1. 删除环信中的好友关系
+        Boolean flag = huanXinTemplate.deleteContact(Constants.HX_USER_PREFIX + UserHolder.getUserId(), Constants.HX_USER_PREFIX + friendId);
+        if (!flag) {
+            throw new BusinessException(ErrorResult.error());
+        }
+        // 2. 删除探花中的好友关系
+        friendApi.delete(UserHolder.getUserId(), friendId);
+    }
 }

@@ -23,4 +23,9 @@ public interface MessagesService {
      * 分页查询联系人列表
      */
     PageResult findFriends(Integer page, Integer pagesize, String keyword);
+
+    /**
+     * 删除好友
+     */
+    void delete(Long friendId);
 }

@@ -1,4 +1,4 @@
-package com.tanhua.model.domain;
+package com.tanhua.model.mongo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
