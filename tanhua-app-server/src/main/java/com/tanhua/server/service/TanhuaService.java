@@ -1,6 +1,7 @@
 package com.tanhua.server.service;
 
 import com.tanhua.model.dto.RecommendUserDto;
+import com.tanhua.model.vo.NearUserVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.TodayBest;
 
@@ -51,4 +52,9 @@ public interface TanhuaService {
      * 不喜欢
      */
     void notLikeUser(Long likeUserId);
+
+    /**
+     * 搜附近
+     */
+    List<NearUserVo> queryNearUser(String gender, String distance);
 }

@@ -37,6 +37,7 @@
         <mybatis.version>3.5.11</mybatis.version>
         <mybatis.mybatis-plus>3.5.2</mybatis.mybatis-plus>
         <lombok.version>1.18.24</lombok.version>
+        <mongo.version>4.0.5</mongo.version>
         <spring-cloud.version>Hoxton.SR10</spring-cloud.version>
         <spring-cloud-alibaba.version>2.2.5.RELEASE</spring-cloud-alibaba.version>
     </properties>

@@ -5,15 +5,14 @@ import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.tanhua.autoconfig.template.HuanXinTemplate;
 import com.tanhua.commons.utils.Constants;
-import com.tanhua.dubbo.api.QuestionApi;
-import com.tanhua.dubbo.api.RecommendUserApi;
-import com.tanhua.dubbo.api.UserInfoApi;
-import com.tanhua.dubbo.api.UserLikeApi;
+import com.tanhua.dubbo.api.*;
 import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.mongo.UserLocation;
 import com.tanhua.model.vo.ErrorResult;
+import com.tanhua.model.vo.NearUserVo;
 import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.TodayBest;
 import com.tanhua.server.exception.BusinessException;
@@ -26,10 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,6 +51,8 @@ public class TanhuaServiceImpl implements TanhuaService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private MessagesService messagesService;
+    @DubboReference
+    private UserLocationApi userLocationApi;
 
     @Override
     public TodayBest todayBest() {
@@ -216,5 +214,38 @@ public class TanhuaServiceImpl implements TanhuaService {
             // 4. 删除好友
             messagesService.delete(likeUserId);
         }
+    }
+
+    @Override
+    public List<NearUserVo> queryNearUser(String gender, String distance) {
+        // 1. 查询附近距离的所有用户
+        List<UserLocation> userLocationList = userLocationApi.queryNearUser(UserHolder.getUserId(), Double.valueOf(distance));
+        if (userLocationList.isEmpty()) {
+            // 随机模拟用户
+            userLocationList = new ArrayList<>();
+            String[] userIds = recommendUser.split(",");
+            for (String userId : userIds) {
+                UserLocation userLocation = userLocationApi.findByUserId(Long.valueOf(userId));
+                userLocationList.add(userLocation);
+            }
+        }
+        // 2. 根据附近用户id查询用户详细信息
+        List<Long> userIdList = userLocationList.stream().map(UserLocation::getUserId).collect(Collectors.toList());
+        UserInfo userInfo = new UserInfo();
+        userInfo.setGender(gender);
+        Map<Long, UserInfo> map = userInfoApi.findByIds(userIdList, userInfo);
+        // 3. 封装数据返回
+        List<NearUserVo> list = new ArrayList<>();
+        for (UserLocation userLocation : userLocationList) {
+            // 排除当前用户
+            if (Objects.equals(userLocation.getUserId(), UserHolder.getUserId())) {
+                continue;
+            }
+            UserInfo info = map.get(userLocation.getUserId());
+            if (info != null) {
+                list.add(NearUserVo.init(info));
+            }
+        }
+        return list;
     }
 }
