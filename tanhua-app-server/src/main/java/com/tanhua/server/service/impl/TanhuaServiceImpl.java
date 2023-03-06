@@ -10,7 +10,6 @@ import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.mongo.RecommendUser;
-import com.tanhua.model.mongo.UserLocation;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.NearUserVo;
 import com.tanhua.model.vo.PageResult;
@@ -219,29 +218,19 @@ public class TanhuaServiceImpl implements TanhuaService {
     @Override
     public List<NearUserVo> queryNearUser(String gender, String distance) {
         // 1. 查询附近距离的所有用户
-        List<UserLocation> userLocationList = userLocationApi.queryNearUser(UserHolder.getUserId(), Double.valueOf(distance));
-        if (userLocationList.isEmpty()) {
-            // 随机模拟用户
-            userLocationList = new ArrayList<>();
-            String[] userIds = recommendUser.split(",");
-            for (String userId : userIds) {
-                UserLocation userLocation = userLocationApi.findByUserId(Long.valueOf(userId));
-                userLocationList.add(userLocation);
-            }
-        }
+        List<Long> userIdList = userLocationApi.queryNearUser(UserHolder.getUserId(), Double.valueOf(distance), recommendUser);
         // 2. 根据附近用户id查询用户详细信息
-        List<Long> userIdList = userLocationList.stream().map(UserLocation::getUserId).collect(Collectors.toList());
         UserInfo userInfo = new UserInfo();
         userInfo.setGender(gender);
         Map<Long, UserInfo> map = userInfoApi.findByIds(userIdList, userInfo);
         // 3. 封装数据返回
         List<NearUserVo> list = new ArrayList<>();
-        for (UserLocation userLocation : userLocationList) {
+        for (Long userId : userIdList) {
             // 排除当前用户
-            if (Objects.equals(userLocation.getUserId(), UserHolder.getUserId())) {
+            if (Objects.equals(userId, UserHolder.getUserId())) {
                 continue;
             }
-            UserInfo info = map.get(userLocation.getUserId());
+            UserInfo info = map.get(userId);
             if (info != null) {
                 list.add(NearUserVo.init(info));
             }

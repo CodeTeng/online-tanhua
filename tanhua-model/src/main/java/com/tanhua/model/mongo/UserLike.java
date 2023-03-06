@@ -20,7 +20,6 @@ import java.io.Serializable;
 @Document(collection = "user_like")
 public class UserLike implements Serializable {
     private static final long serialVersionUID = 6739966698394686523L;
-
     private ObjectId id;
     @Indexed
     private Long userId; //用户id，自己

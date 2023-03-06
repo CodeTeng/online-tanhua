@@ -61,11 +61,11 @@ public class MongoGeoTest {
     @Test
     public void testNear() {
         // 构造坐标点
-        GeoJsonPoint geoJsonPoint = new GeoJsonPoint(116.404, 39.915);
+        GeoJsonPoint point = new GeoJsonPoint(116.404, 39.915);
         // 构造半径
-        Distance distance = new Distance(1, Metrics.KILOMETERS);
+        Distance distance = new Distance(10000, Metrics.KILOMETERS);
         // 画圆圈
-        Circle circle = new Circle(geoJsonPoint, distance);
+        Circle circle = new Circle(point, distance);
         // 构造 query 对象
         Query query = Query.query(Criteria.where("location").withinSphere(circle));
         List<Places> placesList = mongoTemplate.find(query, Places.class);

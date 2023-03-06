@@ -23,6 +23,7 @@ import java.io.Serializable;
 @Document(collection = "user_location")
 @CompoundIndex(name = "location_index", def = "{'location': '2dsphere'}")
 public class UserLocation implements Serializable {
+    private static final long serialVersionUID = 4508868382007529970L;
     @Id
     private ObjectId id;
     @Indexed

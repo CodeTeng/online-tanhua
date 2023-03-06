@@ -12,7 +12,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -56,21 +58,32 @@ public class UserLocationApiImpl implements UserLocationApi {
     }
 
     @Override
-    public List<UserLocation> queryNearUser(Long userId, Double metre) {
+    public List<Long> queryNearUser(Long userId, Double metre, String recommendUser) {
         // 1. 根据用户id查询用户信息
         UserLocation userLocation = mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserLocation.class);
         if (userLocation == null) {
             return null;
         }
         // 2. 已当前用户位置绘制原点
-        GeoJsonPoint geoJsonPoint = userLocation.getLocation();
+        GeoJsonPoint point = userLocation.getLocation();
         // 3. 绘制半径
         Distance distance = new Distance(metre / 1000, Metrics.KILOMETERS);
         // 4. 绘制圆形
-        Circle circle = new Circle(geoJsonPoint, distance);
+        Circle circle = new Circle(point, distance);
         // 5. 查询
         Query query = Query.query(Criteria.where("location").withinSphere(circle));
-        return mongoTemplate.find(query, UserLocation.class);
+        List<UserLocation> userLocationList = mongoTemplate.find(query, UserLocation.class);
+        if (userLocationList.isEmpty()) {
+            // 不存在 随机模拟用户
+            userLocationList = new ArrayList<>();
+            String[] userIds = recommendUser.split(",");
+            for (String id : userIds) {
+                UserLocation location = findByUserId(Long.valueOf(id));
+                userLocationList.add(location);
+            }
+        }
+        // 返回id
+        return userLocationList.stream().map(UserLocation::getUserId).collect(Collectors.toList());
     }
 
     @Override

@@ -16,9 +16,9 @@ public interface UserLocationApi {
     Boolean updateLocation(Long userId, Double longitude, Double latitude, String address);
 
     /**
-     * 查询附件所有用户信息
+     * 查询附件所有用户信息id
      */
-    List<UserLocation> queryNearUser(Long userId, Double metre);
+    List<Long> queryNearUser(Long userId, Double metre, String recommendUser);
 
     /**
      * 根据用户id查询用户位置

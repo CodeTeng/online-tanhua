@@ -121,7 +121,7 @@ public class TanhuaController {
      */
     @GetMapping("/search")
     public ResponseEntity<List<NearUserVo>> queryNearUser(String gender,
-                                                          @RequestParam(defaultValue = "2000") String distance) {
+                                                          @RequestParam(defaultValue = "5000") String distance) {
         List<NearUserVo> list = tanhuaService.queryNearUser(gender, distance);
         return ResponseEntity.ok(list);
     }
