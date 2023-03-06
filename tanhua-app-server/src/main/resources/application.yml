@@ -10,6 +10,10 @@ spring:
     host: 192.168.80.129
     port: 6379
     password: 806823
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   cloud:
     # nacos 配置
     nacos:
@@ -27,6 +31,20 @@ dubbo:
     check: false # 关闭自动检查
     timeout: 3000
     retries: 0
+
+# 分布式文件系统FDFS配置
+fdfs:
+  so-timeout: 1500
+  connect-timeout: 600
+  # 缩略图生成参数
+  thumb-image:
+    width: 150
+    height: 150
+  # TrackerList参数,支持多个
+  tracker-list:
+    - 192.168.80.129:22122
+  # Storage nginx 配置
+  web-server-url: http://192.168.80.129:8888/
 
 tanhua:
   # sms 短信
