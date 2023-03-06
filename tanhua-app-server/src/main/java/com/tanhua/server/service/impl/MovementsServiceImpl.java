@@ -4,11 +4,14 @@ import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.commons.utils.Constants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.VisitorsApi;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.mongo.Movement;
+import com.tanhua.model.mongo.Visitors;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.MovementsService;
@@ -42,6 +45,8 @@ public class MovementsServiceImpl implements MovementsService {
     private UserInfoApi userInfoApi;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @DubboReference
+    private VisitorsApi visitorsApi;
 
     @Override
     public void publishMovement(Movement movement, MultipartFile[] imageContent) throws IOException {
@@ -164,5 +169,31 @@ public class MovementsServiceImpl implements MovementsService {
         // 2. 根据动态查询用户详细信息
         UserInfo userInfo = userInfoApi.findById(movement.getUserId());
         return MovementsVo.init(userInfo, movement);
+    }
+
+    @Override
+    public List<VisitorsVo> queryVisitorsList() {
+        // 1. 查询访问时间
+        String key = Constants.VISITORS_USER;
+        String hashKey = String.valueOf(UserHolder.getUserId());
+        String value = (String) stringRedisTemplate.opsForHash().get(key, hashKey);
+        Long date = StringUtils.isEmpty(value) ? null : Long.valueOf(value);
+        // 2. 查询访客列表
+        List<Visitors> list = visitorsApi.queryMyVisitors(date, UserHolder.getUserId());
+        if (list.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // 3. 查询用户详细信息
+        List<Long> visitedUserIdList = list.stream().map(Visitors::getVisitorUserId).collect(Collectors.toList());
+        Map<Long, UserInfo> map = userInfoApi.findByIds(visitedUserIdList, null);
+        // 4. 构造数据返回
+        List<VisitorsVo> visitorsVos = new ArrayList<>();
+        list.forEach(visitors -> {
+            UserInfo userInfo = map.get(visitors.getVisitorUserId());
+            if (userInfo != null) {
+                visitorsVos.add(VisitorsVo.init(userInfo, visitors));
+            }
+        });
+        return visitorsVos;
     }
 }

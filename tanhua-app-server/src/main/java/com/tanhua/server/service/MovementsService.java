@@ -3,9 +3,11 @@ package com.tanhua.server.service;
 import com.tanhua.model.mongo.Movement;
 import com.tanhua.model.vo.MovementsVo;
 import com.tanhua.model.vo.PageResult;
+import com.tanhua.model.vo.VisitorsVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @description:
@@ -37,4 +39,9 @@ public interface MovementsService {
      * 查询单条动态
      */
     MovementsVo findById(String movementId);
+
+    /**
+     * 谁看过我
+     */
+    List<VisitorsVo> queryVisitorsList();
 }

@@ -10,6 +10,7 @@ import com.tanhua.model.domain.Question;
 import com.tanhua.model.domain.UserInfo;
 import com.tanhua.model.dto.RecommendUserDto;
 import com.tanhua.model.mongo.RecommendUser;
+import com.tanhua.model.mongo.Visitors;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.NearUserVo;
 import com.tanhua.model.vo.PageResult;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,8 @@ public class TanhuaServiceImpl implements TanhuaService {
     private MessagesService messagesService;
     @DubboReference
     private UserLocationApi userLocationApi;
+    @DubboReference
+    private VisitorsApi visitorsApi;
 
     @Override
     public TodayBest todayBest() {
@@ -107,7 +111,16 @@ public class TanhuaServiceImpl implements TanhuaService {
         UserInfo userInfo = userInfoApi.findById(userId);
         // 2. 根据操作人id和查看的用户id，查询两者的推荐数据
         RecommendUser recommendUser = recommendUserApi.queryByUserId(userId, UserHolder.getUserId());
-        // 3. 封装数据返回
+        // 3. 构造访客数据 保存
+        Visitors visitors = new Visitors();
+        visitors.setUserId(userId);
+        visitors.setVisitorUserId(UserHolder.getUserId());
+        visitors.setDate(System.currentTimeMillis());
+        visitors.setFrom("首页");
+        visitors.setVisitDate(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+        visitors.setScore(recommendUser.getScore());
+        visitorsApi.save(visitors);
+        // 4. 封装数据返回
         return TodayBest.init(userInfo, recommendUser);
     }
 
