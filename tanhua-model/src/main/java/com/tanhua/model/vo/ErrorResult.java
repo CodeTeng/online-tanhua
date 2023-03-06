@@ -57,4 +57,12 @@ public class ErrorResult {
     public static ErrorResult disLoveError() {
         return ErrorResult.builder().errCode("000009").errMessage("用户未喜欢").build();
     }
+
+    public static ErrorResult focusError() {
+        return ErrorResult.builder().errCode("000010").errMessage("用户已关注").build();
+    }
+
+    public static ErrorResult unFocusError() {
+        return ErrorResult.builder().errCode("000011").errMessage("用户未关注").build();
+    }
 }

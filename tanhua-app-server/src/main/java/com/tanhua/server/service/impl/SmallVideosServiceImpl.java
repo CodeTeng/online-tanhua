@@ -6,9 +6,11 @@ import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.commons.utils.Constants;
+import com.tanhua.dubbo.api.FocusUserApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.dubbo.api.VideoApi;
 import com.tanhua.model.domain.UserInfo;
+import com.tanhua.model.mongo.FocusUser;
 import com.tanhua.model.mongo.Video;
 import com.tanhua.model.vo.ErrorResult;
 import com.tanhua.model.vo.PageResult;
@@ -49,6 +51,8 @@ public class SmallVideosServiceImpl implements SmallVideosService {
     private StringRedisTemplate stringRedisTemplate;
     @DubboReference
     private UserInfoApi userInfoApi;
+    @DubboReference
+    private FocusUserApi focusUserApi;
 
     @Override
     public void saveVideos(MultipartFile videoThumbnail, MultipartFile videoFile) {
@@ -112,5 +116,44 @@ public class SmallVideosServiceImpl implements SmallVideosService {
             }
         }
         return new PageResult(page, pagesize, 0, vos);
+    }
+
+    @Override
+    public void useFocus(Long uid) {
+        // 1. 判断是否关注过该用户
+        Boolean hasFocus = focusUserApi.hasFocus(uid, UserHolder.getUserId());
+        if (hasFocus) {
+            // 无法再次关注
+            throw new BusinessException(ErrorResult.focusError());
+        }
+        FocusUser focusUser = new FocusUser();
+        focusUser.setUserId(UserHolder.getUserId());
+        focusUser.setFollowUserId(uid);
+        focusUser.setCreated(System.currentTimeMillis());
+        // 2. 保存 MongoDB
+        focusUserApi.save(focusUser);
+        // 3. 保存到 redis 中
+        String key = Constants.MOVEMENTS_INTERACT_KEY + uid;
+        String hashKey = Constants.FOCUS_USER_KEY + UserHolder.getUserId();
+        stringRedisTemplate.opsForHash().put(key, hashKey, "1");
+    }
+
+    @Override
+    public void useUnFocus(Long uid) {
+        // 1. 判断是否关注过该用户
+        Boolean hasFocus = focusUserApi.hasFocus(uid, UserHolder.getUserId());
+        if (!hasFocus) {
+            // 无法取消关注
+            throw new BusinessException(ErrorResult.focusError());
+        }
+        FocusUser focusUser = new FocusUser();
+        focusUser.setUserId(UserHolder.getUserId());
+        focusUser.setFollowUserId(uid);
+        // 2. 从 MongoDB 中删除
+        focusUserApi.delete(focusUser);
+        // 3. 从 redis 中删除
+        String key = Constants.MOVEMENTS_INTERACT_KEY + uid;
+        String hashKey = Constants.FOCUS_USER_KEY + UserHolder.getUserId();
+        stringRedisTemplate.opsForHash().delete(key, hashKey);
     }
 }

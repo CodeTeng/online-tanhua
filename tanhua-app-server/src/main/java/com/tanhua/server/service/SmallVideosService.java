@@ -21,4 +21,14 @@ public interface SmallVideosService {
      * 分页查询视频列表
      */
     PageResult queryVideoList(Integer page, Integer pagesize);
+
+    /**
+     * 用户关注视频作者
+     */
+    void useFocus(Long uid);
+
+    /**
+     * 用户取消关注视频作者
+     */
+    void useUnFocus(Long uid);
 }
