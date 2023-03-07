@@ -26,7 +26,7 @@ public class BaiduController {
      */
     @PostMapping("/location")
     public ResponseEntity updateLocation(@RequestBody Map param) {
-        Double longitude = Double.valueOf(param.get("long7itude").toString());
+        Double longitude = Double.valueOf(param.get("longitude").toString());
         Double latitude = Double.valueOf(param.get("latitude").toString());
         String address = param.get("addrStr").toString();
         baiduService.updateLocation(longitude, latitude, address);
