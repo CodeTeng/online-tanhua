@@ -1,0 +1,14 @@
+server:
+  port: 18083
+spring:
+  profiles:
+    active: dev
+  application:
+    name: tanhua-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.80.129:8848
+      config:
+        server-addr: 192.168.80.129:8848
+        file-extension: yml
