@@ -27,7 +27,7 @@ public class MessagesController {
     @GetMapping("/userinfo")
     public ResponseEntity userinfo(String huanxinId) {
         if (StringUtils.isBlank(huanxinId)) {
-            return ResponseEntity.status(403).body("参数错误");
+            return ResponseEntity.status(400).body("请求参数错误");
         }
         UserInfoVo vo = messagesService.findUserInfoByHuanxinId(huanxinId);
         return ResponseEntity.ok(vo);

@@ -75,7 +75,7 @@ public class MovementsServiceImpl implements MovementsService {
     @Override
     public PageResult findByUserId(Long userId, Integer page, Integer pagesize) {
         // 1. 根据用户id查询动态信息
-        PageResult pageResult = movementApi.findByUserId(userId, page, pagesize);
+        PageResult pageResult = movementApi.findByUserId(userId, page, pagesize, null);
         List<Movement> items = (List<Movement>) pageResult.getItems();
         if (items.size() == 0) {
             return pageResult;

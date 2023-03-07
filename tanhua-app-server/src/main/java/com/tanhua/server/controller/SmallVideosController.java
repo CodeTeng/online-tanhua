@@ -48,7 +48,7 @@ public class SmallVideosController {
     @PostMapping("/{uid}/userFocus")
     public ResponseEntity useFocus(@PathVariable("uid") Long uid) {
         if (uid == null || uid <= 0) {
-            return ResponseEntity.status(403).body("请求参数错误");
+            return ResponseEntity.status(400).body("请求参数错误");
         }
         if (UserHolder.getUserId().equals(uid)) {
             return ResponseEntity.status(500).body("用户自己无法关注自己");
@@ -65,7 +65,7 @@ public class SmallVideosController {
     @PostMapping("/{uid}/useUnFocus")
     public ResponseEntity useUnFocus(@PathVariable("uid") Long uid) {
         if (uid == null || uid <= 0) {
-            return ResponseEntity.status(403).body("请求参数错误");
+            return ResponseEntity.status(400).body("请求参数错误");
         }
         if (UserHolder.getUserId().equals(uid)) {
             return ResponseEntity.status(500).body("用户自己无法关注自己");

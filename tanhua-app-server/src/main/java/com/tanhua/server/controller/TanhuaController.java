@@ -48,7 +48,7 @@ public class TanhuaController {
     @GetMapping("/{id}/personalInfo")
     public ResponseEntity personalInfo(@PathVariable("id") Long userId) {
         if (userId == null || userId <= 0) {
-            return ResponseEntity.status(403).body("参数错误");
+            return ResponseEntity.status(400).body("参数错误");
         }
         TodayBest best = tanhuaService.personalInfo(userId);
         return ResponseEntity.ok(best);
@@ -60,7 +60,7 @@ public class TanhuaController {
     @GetMapping("/strangerQuestions")
     public ResponseEntity strangerQuestions(Long userId) {
         if (userId == null || userId <= 0) {
-            return ResponseEntity.status(403).body("参数错误");
+            return ResponseEntity.status(400).body("参数错误");
         }
         String questions = tanhuaService.strangerQuestions(userId);
         return ResponseEntity.ok(questions);
@@ -77,7 +77,7 @@ public class TanhuaController {
         // 回复内容
         String reply = map.get("reply").toString();
         if (StringUtils.isBlank(reply)) {
-            return ResponseEntity.status(403).body("回复内容不能为空");
+            return ResponseEntity.status(500).body("回复内容不能为空");
         }
         tanhuaService.replyQuestions(userId, reply);
         return ResponseEntity.ok(null);
@@ -98,7 +98,7 @@ public class TanhuaController {
     @GetMapping("{id}/love")
     public ResponseEntity likeUser(@PathVariable("id") Long likeUserId) {
         if (likeUserId == null || likeUserId <= 0) {
-            return ResponseEntity.status(403).body("参数错误");
+            return ResponseEntity.status(400).body("参数错误");
         }
         tanhuaService.likeUser(likeUserId);
         return ResponseEntity.ok(null);
@@ -110,7 +110,7 @@ public class TanhuaController {
     @GetMapping("{id}/unlove")
     public ResponseEntity notLikeUser(@PathVariable("id") Long likeUserId) {
         if (likeUserId == null || likeUserId <= 0) {
-            return ResponseEntity.status(403).body("参数错误");
+            return ResponseEntity.status(400).body("参数错误");
         }
         tanhuaService.notLikeUser(likeUserId);
         return ResponseEntity.ok(null);

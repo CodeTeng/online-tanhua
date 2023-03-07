@@ -58,7 +58,7 @@ public class SystemController {
             return ResponseEntity.status(500).body(errorMap);
         }
         if (StringUtils.isBlank(uuid)) {
-            return ResponseEntity.status(500).body("参数错误");
+            return ResponseEntity.status(400).body("参数错误");
         }
         Map retMap = adminService.login(username, password, verificationCode, uuid);
         return ResponseEntity.ok(retMap);

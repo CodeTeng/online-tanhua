@@ -83,7 +83,7 @@ public class MovementsController {
     @GetMapping("/{id}/like")
     public ResponseEntity like(@PathVariable("id") String movementId) {
         if (StringUtils.isBlank(movementId)) {
-            ResponseEntity.status(403).body("路径参数错误");
+            ResponseEntity.status(400).body("路径参数错误");
         }
         Integer likeCount = commentsService.likeComment(movementId);
         return ResponseEntity.ok(likeCount);
@@ -95,7 +95,7 @@ public class MovementsController {
     @GetMapping("/{id}/dislike")
     public ResponseEntity dislike(@PathVariable("id") String movementId) {
         if (StringUtils.isBlank(movementId)) {
-            ResponseEntity.status(403).body("路径参数错误");
+            ResponseEntity.status(400).body("路径参数错误");
         }
         Integer likeCount = commentsService.dislikeComment(movementId);
         return ResponseEntity.ok(likeCount);

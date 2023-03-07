@@ -38,7 +38,7 @@ public class SettingsController {
         // 获取参数
         String content = (String) map.get("content");
         if (StringUtils.isBlank(content)) {
-            return ResponseEntity.status(403).body("问题不能为空");
+            return ResponseEntity.status(500).body("问题不能为空");
         }
         settingsService.saveQuestion(content);
         return ResponseEntity.ok(null);
@@ -72,7 +72,7 @@ public class SettingsController {
     @DeleteMapping("/blacklist/{uid}")
     public ResponseEntity deleteBlackList(@PathVariable("uid") Long blackUserId) {
         if (blackUserId == null || blackUserId <= 0) {
-            return ResponseEntity.status(404).body("请求路径错误");
+            return ResponseEntity.status(400).body("请求路径错误");
         }
         settingsService.deleteBlackList(blackUserId);
         return ResponseEntity.ok(null);

@@ -19,7 +19,7 @@ public interface MovementApi {
     /**
      * 分页查询个人动态
      */
-    PageResult findByUserId(Long userId, Integer page, Integer pagesize);
+    PageResult findByUserId(Long userId, Integer page, Integer pagesize, Integer state);
 
     /**
      * 查询好友动态

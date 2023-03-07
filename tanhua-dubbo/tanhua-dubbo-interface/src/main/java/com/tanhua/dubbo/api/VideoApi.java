@@ -1,6 +1,7 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.model.mongo.Video;
+import com.tanhua.model.vo.PageResult;
 
 import java.util.List;
 
@@ -24,4 +25,9 @@ public interface VideoApi {
      * 分页查询小视频数据
      */
     List<Video> queryVideoList(int page, Integer pagesize);
+
+    /**
+     * 分页查询指定用户发布的所有视频列表
+     */
+    PageResult findAllVideos(Integer page, Integer pagesize, Long uid);
 }

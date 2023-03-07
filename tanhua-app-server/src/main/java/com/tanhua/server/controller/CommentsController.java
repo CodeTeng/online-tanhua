@@ -28,7 +28,7 @@ public class CommentsController {
                                        @RequestParam(defaultValue = "10") Integer pagesize,
                                        String movementId) {
         if (StringUtils.isBlank(movementId)) {
-            return ResponseEntity.status(404).body("请求路径错误");
+            return ResponseEntity.status(400).body("请求参数错误");
         }
         PageResult pr = commentsService.findComments(movementId, page, pagesize);
         return ResponseEntity.ok(pr);
@@ -42,7 +42,7 @@ public class CommentsController {
         String movementId = (String) map.get("movementId");
         String content = (String) map.get("comment");
         if (StringUtils.isAnyBlank(movementId, content)) {
-            return ResponseEntity.status(403).body("请求参数错误");
+            return ResponseEntity.status(400).body("请求参数错误");
         }
         commentsService.saveComments(movementId, content);
         return ResponseEntity.ok(null);

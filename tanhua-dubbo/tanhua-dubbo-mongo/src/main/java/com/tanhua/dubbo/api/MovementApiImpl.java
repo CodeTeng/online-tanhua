@@ -66,12 +66,20 @@ public class MovementApiImpl implements MovementApi {
     }
 
     @Override
-    public PageResult findByUserId(Long userId, Integer page, Integer pagesize) {
-        Query query = Query.query(Criteria.where("userId").is(userId))
-                .skip((long) (page - 1) * pagesize).limit(pagesize)
-                .with(Sort.by(Sort.Order.desc("created")));
-        List<Movement> movementList = mongoTemplate.find(query, Movement.class);
-        return new PageResult(page, pagesize, 0, movementList);
+    public PageResult findByUserId(Long userId, Integer page, Integer pagesize, Integer state) {
+        Query query = new Query();
+        if (userId != null) {
+            query.addCriteria(Criteria.where("userId").is(userId));
+        }
+        if (state != null) {
+            query.addCriteria(Criteria.where("state").is(state));
+        }
+        // 查询总数
+        int count = (int) mongoTemplate.count(query, Movement.class);
+        // 设置分页参数
+        query.skip((long) (page - 1) * pagesize).limit(pagesize).with(Sort.by(Sort.Order.desc("created")));
+        List<Movement> list = mongoTemplate.find(query, Movement.class);
+        return new PageResult(page, pagesize, count, list);
     }
 
     @Override
