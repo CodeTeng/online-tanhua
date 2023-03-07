@@ -8,6 +8,8 @@ package com.tanhua.commons.utils;
 public interface Constants {
     //手机APP短信验证码CHECK_CODE_
     String SMS_CODE = "CHECK_CODE_";
+    // 图片验证码前缀
+    String CAP_CODE = "CHECK_CODE_";
 
     //冻结用户状态KEY
     String USER_FREEZE = "USER_FREEZE_";

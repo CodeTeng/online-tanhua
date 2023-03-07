@@ -1,14 +1,17 @@
 package com.tanhua.admin.service;
 
-import com.tanhua.admin.mapper.AdminMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
+import com.tanhua.model.vo.AdminVo;
 
-@Service
-public class AdminService {
-    @Autowired
-    private AdminMapper adminMapper;
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+import java.util.Map;
+
+public interface AdminService {
+    /**
+     * 用户登录
+     */
+    Map login(String username, String password, String verificationCode, String uuid);
+
+    /**
+     * 获取用户的信息
+     */
+    AdminVo profile();
 }
