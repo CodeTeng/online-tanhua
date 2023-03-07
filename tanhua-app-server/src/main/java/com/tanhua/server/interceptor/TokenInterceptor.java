@@ -24,6 +24,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             response.getWriter().write("请重新登录");
             return false;
         }
+        // 下面可以省略 网关已经鉴权了
         boolean flag = JwtUtils.verifyToken(token);
         if (!flag) {
             response.setContentType("application/json;charset=utf-8");

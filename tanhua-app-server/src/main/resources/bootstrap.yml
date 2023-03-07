@@ -1,10 +1,10 @@
 server:
-  port: 18081
+  port: 18080
 spring:
   profiles:
     active: dev
   application:
-    name: tanhua-dubbo-db
+    name: tanhua-app-server
   cloud:
     nacos:
       discovery:
