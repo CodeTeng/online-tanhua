@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@TableName("tb_analysis_by_day")
+@TableName("tb_analysis")
 public class Analysis implements Serializable {
     private Long id;
     /**
