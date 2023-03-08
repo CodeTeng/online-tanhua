@@ -6,6 +6,7 @@ import com.tanhua.commons.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
+import com.tanhua.server.service.MqMessageService;
 import com.tanhua.server.service.UserFreezeService;
 import com.tanhua.server.service.UserService;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -38,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private HuanXinTemplate huanXinTemplate;
     @Autowired
     private UserFreezeService userFreezeService;
+    @Autowired
+    private MqMessageService mqMessageService;
 
     @Override
     public ResponseEntity sendMsg(String mobile) {
@@ -89,6 +92,9 @@ public class UserServiceImpl implements UserService {
                 userApi.update(user);
             }
         }
+        // 发送日志到 rabbitMQ
+        String type = "0101";//登录
+        mqMessageService.sendLogMessage(user.getId(), type, "user", null);
         // 6. 生成 token
         Map tokenMap = new HashMap();
         tokenMap.put("id", user.getId());

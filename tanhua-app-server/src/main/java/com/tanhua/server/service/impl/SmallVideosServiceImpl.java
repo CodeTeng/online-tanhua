@@ -17,6 +17,7 @@ import com.tanhua.model.vo.PageResult;
 import com.tanhua.model.vo.VideoVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
+import com.tanhua.server.service.MqMessageService;
 import com.tanhua.server.service.SmallVideosService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -54,6 +55,8 @@ public class SmallVideosServiceImpl implements SmallVideosService {
     private UserInfoApi userInfoApi;
     @DubboReference
     private FocusUserApi focusUserApi;
+    @Autowired
+    private MqMessageService mqMessageService;
 
     @Override
     public void saveVideos(MultipartFile videoThumbnail, MultipartFile videoFile) {
@@ -72,6 +75,7 @@ public class SmallVideosServiceImpl implements SmallVideosService {
             video.setVideoUrl(videoUrl);
             video.setText("我就是我，不一样的烟火");
             videoApi.save(video);
+            mqMessageService.sendLogMessage(UserHolder.getUserId(), "0301", "videos", video.getId().toHexString());
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException(ErrorResult.error());

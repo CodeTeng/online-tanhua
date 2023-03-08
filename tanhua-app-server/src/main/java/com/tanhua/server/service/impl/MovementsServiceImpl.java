@@ -15,6 +15,7 @@ import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.MovementsService;
+import com.tanhua.server.service.MqMessageService;
 import com.tanhua.server.service.UserFreezeService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -50,6 +51,8 @@ public class MovementsServiceImpl implements MovementsService {
     private VisitorsApi visitorsApi;
     @Autowired
     private UserFreezeService userFreezeService;
+    @Autowired
+    private MqMessageService mqMessageService;
 
     @Override
     public void publishMovement(Movement movement, MultipartFile[] imageContent) throws IOException {
@@ -75,6 +78,8 @@ public class MovementsServiceImpl implements MovementsService {
         movement.setUserId(userId);
         // 4. 调用API完成发布动态
         movementApi.publish(movement);
+        // 发送日志到 rabbitMQ
+        mqMessageService.sendLogMessage(userId, "0201", "movement", movement.getId().toHexString());
     }
 
     @Override
@@ -93,6 +98,8 @@ public class MovementsServiceImpl implements MovementsService {
             MovementsVo movementsVo = MovementsVo.init(userInfo, movement);
             list.add(movementsVo);
         });
+        // 发送日志到 rabbitMQ
+        mqMessageService.sendLogMessage(userId, "0202", "movement", null);
         // 4. 封装返回
         pageResult.setItems(list);
         return pageResult;
@@ -104,6 +111,7 @@ public class MovementsServiceImpl implements MovementsService {
         Long userId = UserHolder.getUserId();
         // 2、调用API查询当前用户好友发布的动态列表
         List<Movement> list = movementApi.findFriendMovements(page, pagesize, userId);
+        mqMessageService.sendLogMessage(userId, "0202", "movement", null);
         // 3、判断列表是否为空
         return getPageResult(page, pagesize, list);
     }
@@ -161,6 +169,7 @@ public class MovementsServiceImpl implements MovementsService {
                 list = movementApi.findMovementsByPids(pidList);
             }
         }
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0202", "movement", null);
         return getPageResult(page, pagesize, list);
     }
 
@@ -173,6 +182,7 @@ public class MovementsServiceImpl implements MovementsService {
         }
         // 2. 根据动态查询用户详细信息
         UserInfo userInfo = userInfoApi.findById(movement.getUserId());
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0202", "movement", movementId);
         return MovementsVo.init(userInfo, movement);
     }
 
@@ -199,6 +209,7 @@ public class MovementsServiceImpl implements MovementsService {
                 visitorsVos.add(VisitorsVo.init(userInfo, visitors));
             }
         });
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0202", "movement", null);
         return visitorsVos;
     }
 }

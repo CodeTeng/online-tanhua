@@ -12,6 +12,7 @@ import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.CommentsService;
+import com.tanhua.server.service.MqMessageService;
 import com.tanhua.server.service.UserFreezeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -41,6 +42,8 @@ public class CommentsServiceImpl implements CommentsService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private UserFreezeService userFreezeService;
+    @Autowired
+    private MqMessageService mqMessageService;
 
     @Override
     public PageResult findComments(String movementId, Integer page, Integer pagesize) {
@@ -61,6 +64,7 @@ public class CommentsServiceImpl implements CommentsService {
                 vos.add(vo);
             }
         });
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0205", "comment", null);
         return new PageResult(page, pagesize, 0, vos);
     }
 
@@ -79,7 +83,9 @@ public class CommentsServiceImpl implements CommentsService {
         comment.setCreated(System.currentTimeMillis());
         // 3、保存评论 并获取评论数量
         Integer commentCount = commentApi.save(comment);
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0205", "comment", movementId);
         log.info("评论数量：{}", commentCount);
+
     }
 
     @Override
@@ -100,6 +106,7 @@ public class CommentsServiceImpl implements CommentsService {
         String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;
         String hashKey = Constants.MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();
         stringRedisTemplate.opsForHash().put(key, hashKey, "1");
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0203", "comment", null);
         return count;
     }
 
@@ -120,6 +127,7 @@ public class CommentsServiceImpl implements CommentsService {
         String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;
         String hashKey = Constants.MOVEMENT_LIKE_HASHKEY + UserHolder.getUserId();
         stringRedisTemplate.opsForHash().delete(key, hashKey);
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0207", "comment", null);
         return count;
     }
 
@@ -138,6 +146,7 @@ public class CommentsServiceImpl implements CommentsService {
         String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;
         String hashKey = Constants.MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();
         stringRedisTemplate.opsForHash().put(key, hashKey, "1");
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0204", "comment", null);
         return count;
     }
 
@@ -155,6 +164,7 @@ public class CommentsServiceImpl implements CommentsService {
         String key = Constants.MOVEMENTS_INTERACT_KEY + movementId;
         String hashKey = Constants.MOVEMENT_LOVE_HASHKEY + UserHolder.getUserId();
         stringRedisTemplate.opsForHash().delete(key, hashKey);
+        mqMessageService.sendLogMessage(UserHolder.getUserId(), "0206", "comment", null);
         return count;
     }
 }
