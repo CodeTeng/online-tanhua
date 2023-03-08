@@ -29,4 +29,19 @@ public class MqConfig {
     public Binding logBinding() {
         return BindingBuilder.bind(logQueue()).to(logTopicExchange()).with(MQConstants.LOG_ROUTING_KEY);
     }
+
+    @Bean
+    public TopicExchange auditTopicExchange() {
+        return new TopicExchange(MQConstants.AUDIT_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Queue auditQueue() {
+        return new Queue(MQConstants.AUDIT_QUEUE, true);
+    }
+
+    @Bean
+    public Binding auditBinding() {
+        return BindingBuilder.bind(auditQueue()).to(auditTopicExchange()).with(MQConstants.AUDIT_ROUTING_KEY);
+    }
 }

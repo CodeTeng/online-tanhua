@@ -42,4 +42,6 @@ public interface MovementApi {
      * 根据id查询动态
      */
     Movement findById(String movementId);
+
+    void update(String movementId, Integer state);
 }

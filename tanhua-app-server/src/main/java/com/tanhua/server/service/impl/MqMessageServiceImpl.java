@@ -40,4 +40,13 @@ public class MqMessageServiceImpl implements MqMessageService {
             throw new BusinessException(ErrorResult.builder().errMessage("发送消息失败").build());
         }
     }
+
+    @Override
+    public void sendAudiMessage(String movementId) {
+        try {
+            amqpTemplate.convertAndSend(MQConstants.AUDIT_EXCHANGE, MQConstants.AUDIT_ROUTING_KEY, movementId);
+        } catch (AmqpException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,5 +118,12 @@ public class MovementApiImpl implements MovementApi {
     @Override
     public Movement findById(String movementId) {
         return mongoTemplate.findById(movementId, Movement.class);
+    }
+
+    @Override
+    public void update(String movementId, Integer state) {
+        Query query = Query.query(Criteria.where("id").in(new ObjectId(movementId)));
+        Update update = Update.update("state", state);
+        mongoTemplate.updateFirst(query, update, Movement.class);
     }
 }

@@ -28,4 +28,9 @@ public interface MqMessageService {
      * @param busId  业务id  动态id或者视频id
      */
     void sendLogMessage(Long userId, String type, String key, String busId);
+
+    /**
+     * 发送动态审核消息
+     */
+    void sendAudiMessage(String movementId);
 }

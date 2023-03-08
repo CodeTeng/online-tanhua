@@ -2,6 +2,7 @@ package com.tanhua.server.service.impl;
 
 import com.tanhua.autoconfig.template.OssTemplate;
 import com.tanhua.commons.utils.Constants;
+import com.tanhua.commons.utils.MQConstants;
 import com.tanhua.dubbo.api.MovementApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.dubbo.api.VisitorsApi;
@@ -19,6 +20,7 @@ import com.tanhua.server.service.MqMessageService;
 import com.tanhua.server.service.UserFreezeService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -53,6 +55,8 @@ public class MovementsServiceImpl implements MovementsService {
     private UserFreezeService userFreezeService;
     @Autowired
     private MqMessageService mqMessageService;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     @Override
     public void publishMovement(Movement movement, MultipartFile[] imageContent) throws IOException {
@@ -80,6 +84,8 @@ public class MovementsServiceImpl implements MovementsService {
         movementApi.publish(movement);
         // 发送日志到 rabbitMQ
         mqMessageService.sendLogMessage(userId, "0201", "movement", movement.getId().toHexString());
+        // 发送动态审核消息
+        amqpTemplate.convertAndSend(MQConstants.AUDIT_EXCHANGE, MQConstants.AUDIT_ROUTING_KEY, movement.getId().toHexString());
     }
 
     @Override
