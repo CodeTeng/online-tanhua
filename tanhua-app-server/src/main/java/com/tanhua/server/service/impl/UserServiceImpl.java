@@ -6,6 +6,7 @@ import com.tanhua.commons.utils.Constants;
 import com.tanhua.commons.utils.JwtUtils;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.model.domain.User;
+import com.tanhua.server.service.UserFreezeService;
 import com.tanhua.server.service.UserService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -35,9 +36,16 @@ public class UserServiceImpl implements UserService {
     private UserApi userApi;
     @Autowired
     private HuanXinTemplate huanXinTemplate;
+    @Autowired
+    private UserFreezeService userFreezeService;
 
     @Override
     public ResponseEntity sendMsg(String mobile) {
+        // 校验用户状态
+        User user = userApi.findByMobile(mobile);
+        if (user != null) {
+            userFreezeService.checkUserStatus("1", user.getId());
+        }
         // 1. 随机生成6位号码
         String code = RandomStringUtils.randomNumeric(6);
         // 2. 发送短信

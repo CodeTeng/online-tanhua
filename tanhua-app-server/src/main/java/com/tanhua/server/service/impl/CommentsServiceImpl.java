@@ -12,6 +12,7 @@ import com.tanhua.model.vo.PageResult;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.CommentsService;
+import com.tanhua.server.service.UserFreezeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
@@ -38,6 +39,8 @@ public class CommentsServiceImpl implements CommentsService {
     private UserInfoApi userInfoApi;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private UserFreezeService userFreezeService;
 
     @Override
     public PageResult findComments(String movementId, Integer page, Integer pagesize) {
@@ -65,6 +68,8 @@ public class CommentsServiceImpl implements CommentsService {
     public void saveComments(String movementId, String content) {
         // 1、获取操作用户id
         Long userId = UserHolder.getUserId();
+        // 校验用户是否被冻结
+        userFreezeService.checkUserStatus("2", userId);
         // 2、构造Comment
         Comment comment = new Comment();
         comment.setPublishId(new ObjectId(movementId));

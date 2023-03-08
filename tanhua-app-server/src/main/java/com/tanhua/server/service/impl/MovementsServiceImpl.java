@@ -15,6 +15,7 @@ import com.tanhua.model.vo.VisitorsVo;
 import com.tanhua.server.exception.BusinessException;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.service.MovementsService;
+import com.tanhua.server.service.UserFreezeService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +48,20 @@ public class MovementsServiceImpl implements MovementsService {
     private StringRedisTemplate stringRedisTemplate;
     @DubboReference
     private VisitorsApi visitorsApi;
+    @Autowired
+    private UserFreezeService userFreezeService;
 
     @Override
     public void publishMovement(Movement movement, MultipartFile[] imageContent) throws IOException {
+        // 校验用户状态，判断是否已被冻结
+        Long userId = UserHolder.getUserId();
+        userFreezeService.checkUserStatus("3", userId);
         // 1. 判断发布内容是否为空
         String content = movement.getTextContent();
         if (StringUtils.isBlank(content)) {
             throw new BusinessException(ErrorResult.contentError());
         }
         // 2. 获取当前用户id
-        Long userId = UserHolder.getUserId();
         List<String> medias = new ArrayList<>();
         // 3. 上传图片至 OSS
         for (MultipartFile multipartFile : imageContent) {
